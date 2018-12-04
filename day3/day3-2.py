@@ -27,6 +27,8 @@ for line in lines:
 	for i in range(y,runy+y):
 		for j in range(x,runx+x):
 			if table[i][j] != 0:
+				if table[i][j] not in dq:
+					dq.append(table[i][j])
 				if line.split(' ')[0] in dq:
 					continue
 				dq.append(line.split(' ')[0])
@@ -35,5 +37,4 @@ for line in lines:
 for line in lines:
 	if line.split(' ')[0] in dq:
 		continue
-	print(line.split(' ')[0])
-print(dq)
+	print("Valid claim! " + line.split(' ')[0])
