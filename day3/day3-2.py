@@ -27,13 +27,11 @@ for line in lines:
 	for i in range(y,runy+y):
 		for j in range(x,runx+x):
 			if table[i][j] != 0:
-				if table[i][j] not in dq:
-					dq.append(table[i][j])
-				if line.split(' ')[0] in dq:
-					continue
+				dq.append(table[i][j])
 				dq.append(line.split(' ')[0])
 			elif table[i][j] == 0:
 				table[i][j] = line.split(' ')[0]
+dq = list(set(dq))
 for line in lines:
 	if line.split(' ')[0] in dq:
 		continue
