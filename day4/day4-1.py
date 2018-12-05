@@ -20,7 +20,7 @@ dates = sorted(set(dates))
 datetimes = sorted(datetimes)
 
 guardlist = { date : {} for i in range(0,60) for date in dates }
-
+currentguard = ""
 for date in datetimes:
 	if 'Guard #' in sortedlog[date]:
 		currentguard = sortedlog[date].split('#')[1].split(' ')[0]
@@ -40,23 +40,21 @@ for date in guards:
 				y = guards[date][guard][i+1] # get end of sleep
 			except:
 				break
-			guard_time, remainder = divmod((y-x).total_seconds(), 60)
 			i+=1
-			for i in range(x.time().minute, y.time().minute):
-				guardlist[x.date()][guard].append(i)
+			for j in range(int(x.time().minute), int(y.time().minute)):
+				guardlist[x.date()][guard].append(j)
 
-for date in dates:
-	total = 0
+for date in guardlist:
 	for guard in guardlist[date]:
 		if guard not in guardtimes.keys():
 			guardtimes[guard] = 0
-		total += len(guardlist[date][guard])
-		guardtimes[guard] += total
+		guardtimes[guard] += len(guardlist[date][guard])
 sleepy = max(guardtimes, key=guardtimes.get)
-print('Guard #'+ str(sleepy) +' slept the most.')
-for date in dates:
+print('Guard #'+ str(sleepy) +' slept a total of ' + str(guardtimes[sleepy])+ ' minutes.')
+
+for date in guardlist:
 	if sleepy in guardlist[date].keys():
 		mergedlist += guardlist[date][sleepy]
-asleep = max(set(mergedlist), key=mergedlist.count)
+asleep = max(mergedlist, key=mergedlist.count)
 print('Sleepy spent minute ' + str(asleep) + ' asleep the most.')
 print('Solution: ' + str(int(asleep)*int(sleepy)))
