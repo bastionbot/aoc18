@@ -14,12 +14,14 @@ with open('input.txt') as f:
 			reqs[p] = [s]
 		else:
 			reqs[p].append(s)
-for k in sorted(reqs, key=lambda k: len(reqs[k]), reverse=True):
-	print(k, reqs[k])
 step = ''.join(sorted(list(set(steps) - set(presteps))))
 while (len(step) < len(steps)+1):
-	for k, v in sorted(reqs.items()):
+	for k in sorted(reqs.keys()): #sorted(reqs, key=lambda k: len(reqs[k])):
 		reqs[k] = list(set(reqs[k]) - set(step))
-		if len(reqs[k]) == 0 and k not in step:
-			step += k
+		try:
+			if k not in step and k == min(list(set(''.join([j for j,v in reqs.items() if not v])) - set(step))):
+				step += k
+				print(step)
+		except:
+			continue
 print(''.join(step))
