@@ -1,6 +1,7 @@
 #!/bin/python3
 import string, sys
 global step 
+global reqs
 step = ''
 reqs = {}
 steps = []
@@ -22,50 +23,53 @@ for char in ''.join(sorted(list(set(steps) - set(presteps)))):
 	reqs[char] = []
 
 def valid_step(reqs):
-	foo = None
-	for k in sorted([j for j,v in reqs.items() if not v]):
-		try:
-			if k not in step and k == min(list(set(''.join([j for j,v in reqs.items() if not v])) - set(step))):
-				foo = k
-		except:
-			continue
-	return foo
-def remove_step(reqs, k):
+	available_steps = [j for j,v in reqs.items() if not v]
+	k = sorted(list(set([j for j,v in reqs.items() if not v]) - set(step)))
+	return k
+
+def remove_step(k):
 	global step
+	global reqs
 	for l in reqs.keys():
 		try:
 			reqs[l].remove(k)
 		except:
 			continue
 	step += k
-	return reqs, step
 class worker:
-	def __init__(self):
+	def __init__(self, elf):
 		self.status = 'Idle'
 		self.starttime = 0
 		self.step = '.'
+		self.elf = elf
 timer = 0
 for i in range(int(sys.argv[2])):
-	workers.append(worker())
-info = ("Second", '\t'.join(['Elf'+str(i) for i in range(int(sys.argv[2]))]), "Step")
+	workers.append(worker(i))
+info = ("Second", '\t'.join(['Elf'+str(i) for i in range(int(sys.argv[2]))]), "Done")
 while (len(step) < len(steps)+1):
+	current_steps = list(set(valid_step(reqs)) - set([worker.step for worker in workers]))
+	if '.' in current_steps:
+		current_steps.remove('.')
 	for worker in workers:
-		if worker.status == 'Working':
-			if worker.step is not None:
-				if (string.ascii_uppercase.index(worker.step) + 1) + worker.starttime == timer:
-					worker.status = 'Idle'
-					worker.starttime = 0
-					reqs, step = remove_step(reqs, worker.step)
-					worker.step = '.'
-		elif worker.status == 'Idle' and valid_step(reqs) not in [work.step for work in workers] and valid_step(reqs) is not None:
-			worker.step = valid_step(reqs)
+		if worker.status != 'Working' and current_steps:
+			worker.step = min(current_steps)
+			current_steps.remove(worker.step)
 			worker.status = 'Working'
 			worker.starttime = timer
-		else:
-			worker.status = 'Idle'
-	if valid_step(reqs) not in [work.step for work in workers] and valid_step(reqs) is not None:
-		continue
-	timer += 1
+		if worker.status == 'Working' and (string.ascii_uppercase.index(worker.step) + 61) + worker.starttime == timer:
+			remove_step(worker.step)
+			current_steps = list(set(valid_step(reqs)) - set([worker.step for worker in workers]))
+			if '.' in current_steps:
+				current_steps.remove('.')
+			try:
+				worker.step = min(current_steps)
+				current_steps.remove(worker.step)
+				worker.status = 'Working'
+				worker.starttime = timer
+			except:
+				worker.status = 'Idle'
+				worker.step = '.'
 	print('%s\t%s\t%s' % info)
+	timer += 1
 	info = (str(timer), '\t'.join([worker.step for worker in workers]), step)
-print("Total time: %d\nFinal step: %s" % (timer, ''.join(step)))
+print('%s\t%s\t%s' % (str(timer), '\t'.join([worker.step for worker in workers]), step))
